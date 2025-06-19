@@ -1,17 +1,20 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MessageCircle, X, DollarSign, TrendingUp, TrendingDown, PieChart } from "lucide-react";
+import { MessageCircle, X, DollarSign, TrendingUp, TrendingDown, PieChart, RefreshCw } from "lucide-react";
 import { PieChart as RechartsPieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
+import { useSheetData } from "../hooks/useSheetData";
 
 const Index = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const { categoryData, loading, error, refreshData } = useSheetData();
 
-  // Sample data - will be replaced with Google Sheets integration
+  // Sample data for other metrics - can be expanded to use sheets too
   const budgetData = {
     total: 5000,
     remaining: 2350,
-    spent: 2650
+    spent: categoryData.reduce((sum, item) => sum + item.value, 0)
   };
 
   const incomeData = {
@@ -20,24 +23,9 @@ const Index = () => {
   };
 
   const expenseData = {
-    total: 2650,
+    total: categoryData.reduce((sum, item) => sum + item.value, 0),
     growth: -3.2
   };
-
-  const categoryData = [
-    { name: "Debt & Loan", value: 480, color: "#EF4444" },
-    { name: "Entertainment", value: 320, color: "#F59E0B" },
-    { name: "Family", value: 290, color: "#10B981" },
-    { name: "Food", value: 650, color: "#3B82F6" },
-    { name: "Health", value: 180, color: "#8B5CF6" },
-    { name: "Housing", value: 850, color: "#EC4899" },
-    { name: "Investment", value: 400, color: "#14B8A6" },
-    { name: "Shopping", value: 380, color: "#F97316" },
-    { name: "Subscription", value: 120, color: "#6366F1" },
-    { name: "Transport", value: 220, color: "#84CC16" },
-    { name: "Work & Education", value: 300, color: "#06B6D4" },
-    { name: "Others", value: 150, color: "#64748B" }
-  ];
 
   const barData = categoryData.map(item => ({
     category: item.name.split(' ')[0],
@@ -52,9 +40,49 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4 md:p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Financial Dashboard</h1>
-          <p className="text-gray-600">Your financial overview at a glance</p>
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Financial Dashboard</h1>
+            <p className="text-gray-600">Your financial overview at a glance</p>
+          </div>
+          <Button 
+            onClick={refreshData} 
+            variant="outline" 
+            size="sm"
+            disabled={loading}
+            className="flex items-center gap-2"
+          >
+            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            Refresh Data
+          </Button>
+        </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-red-700">
+              <strong>Data Connection Issue:</strong> {error}
+            </p>
+            <p className="text-sm text-red-600 mt-1">
+              Using sample data. Please check your Google Sheets configuration in the console.
+            </p>
+          </div>
+        )}
+
+        {/* Configuration Info */}
+        <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <h3 className="font-semibold text-blue-900 mb-2">📊 Sheet Configuration</h3>
+          <p className="text-sm text-blue-700 mb-2">
+            To connect your Google Sheets data, update the configuration in <code>src/services/googleSheetsService.ts</code>:
+          </p>
+          <ul className="text-sm text-blue-700 space-y-1">
+            <li>• <strong>spreadsheetId:</strong> Your Google Sheets ID from the URL</li>
+            <li>• <strong>sheetName:</strong> The name of your sheet tab (e.g., "Sheet1")</li>
+            <li>• <strong>range:</strong> Cell ranges for each category (e.g., "A2:B2")</li>
+          </ul>
+          <p className="text-xs text-blue-600 mt-2">
+            <strong>Note:</strong> Your Google Sheet must be publicly viewable for this method to work.
+          </p>
         </div>
 
         {/* Main Grid */}
@@ -68,13 +96,13 @@ const Index = () => {
             <CardContent>
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-2xl font-bold text-gray-900">${budgetData.remaining.toLocaleString()}</span>
+                  <span className="text-2xl font-bold text-gray-900">${(budgetData.total - budgetData.spent).toLocaleString()}</span>
                   <span className="text-sm text-gray-500">remaining</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div 
                     className="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full transition-all duration-500" 
-                    style={{ width: `${(budgetData.remaining / budgetData.total) * 100}%` }}
+                    style={{ width: `${((budgetData.total - budgetData.spent) / budgetData.total) * 100}%` }}
                   ></div>
                 </div>
                 <div className="flex justify-between text-sm text-gray-500">
@@ -127,7 +155,10 @@ const Index = () => {
           {/* Pie Chart */}
           <Card className="shadow-sm border-0 bg-white/80 backdrop-blur-sm hover:shadow-md transition-shadow duration-300">
             <CardHeader>
-              <CardTitle className="text-lg font-semibold text-gray-900">Expense Breakdown</CardTitle>
+              <CardTitle className="text-lg font-semibold text-gray-900">
+                Expense Breakdown
+                {loading && <span className="text-sm font-normal text-gray-500 ml-2">(Loading...)</span>}
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="h-64">
@@ -156,7 +187,10 @@ const Index = () => {
           {/* Bar Chart */}
           <Card className="shadow-sm border-0 bg-white/80 backdrop-blur-sm hover:shadow-md transition-shadow duration-300">
             <CardHeader>
-              <CardTitle className="text-lg font-semibold text-gray-900">Category Spending</CardTitle>
+              <CardTitle className="text-lg font-semibold text-gray-900">
+                Category Spending
+                {loading && <span className="text-sm font-normal text-gray-500 ml-2">(Loading...)</span>}
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="h-64">
