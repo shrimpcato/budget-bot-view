@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MessageCircle, X, DollarSign, TrendingUp, TrendingDown, PieChart } from "lucide-react";
-import { PieChart as RechartsPieChart, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
+import { PieChart as RechartsPieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
 
 const Index = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -127,11 +127,11 @@ const Index = () => {
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
                   <RechartsPieChart>
-                    <RechartsPieChart data={categoryData} cx="50%" cy="50%" outerRadius={80} fill="#8884d8" dataKey="value">
+                    <Pie data={categoryData} cx="50%" cy="50%" outerRadius={80} dataKey="value">
                       {categoryData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
-                    </RechartsPieChart>
+                    </Pie>
                     <Tooltip formatter={(value) => [`$${value}`, 'Amount']} />
                   </RechartsPieChart>
                 </ResponsiveContainer>
