@@ -13,6 +13,11 @@ export interface CategoryMapping {
   sheetConfig: SheetConfig;
 }
 
+export interface FinancialDataMapping {
+  key: string;
+  sheetConfig: SheetConfig;
+}
+
 // Default configuration - user can modify these values
 export const DEFAULT_SHEET_CONFIG: SheetConfig = {
   spreadsheetId: "your-spreadsheet-id-here", // Replace with your actual spreadsheet ID
@@ -34,6 +39,13 @@ export const CATEGORY_MAPPINGS: CategoryMapping[] = [
   { category: "Transport", sheetConfig: { ...DEFAULT_SHEET_CONFIG, range: "A11:B11" } },
   { category: "Work & Education", sheetConfig: { ...DEFAULT_SHEET_CONFIG, range: "A12:B12" } },
   { category: "Others", sheetConfig: { ...DEFAULT_SHEET_CONFIG, range: "A13:B13" } }
+];
+
+// Financial data mappings - add these to your sheet
+export const FINANCIAL_DATA_MAPPINGS: FinancialDataMapping[] = [
+  { key: "totalBudget", sheetConfig: { ...DEFAULT_SHEET_CONFIG, range: "A14:B14" } },
+  { key: "totalIncome", sheetConfig: { ...DEFAULT_SHEET_CONFIG, range: "A15:B15" } },
+  { key: "incomeGrowth", sheetConfig: { ...DEFAULT_SHEET_CONFIG, range: "A16:B16" } }
 ];
 
 // Fetch data from Google Sheets using CSV export (works with public sheets)
@@ -91,9 +103,9 @@ export const getCellValue = (data: any[], range: string): string | number => {
 // Fetch all category data
 export const fetchAllCategoryData = async () => {
   const colors = [
-    "#EF4444", "#F59E0B", "#10B981", "#3B82F6", "#8B5CF6", 
-    "#EC4899", "#14B8A6", "#F97316", "#6366F1", "#84CC16", 
-    "#06B6D4", "#64748B"
+    "#00D4FF", "#FF6B35", "#00FFB7", "#FFD700", "#FF1493", 
+    "#00CED1", "#FF69B4", "#32CD32", "#FF4500", "#1E90FF", 
+    "#FF6347", "#40E0D0"
   ];
   
   try {
@@ -127,5 +139,40 @@ export const fetchAllCategoryData = async () => {
       value: Math.floor(Math.random() * 500) + 100,
       color: colors[index % colors.length]
     }));
+  }
+};
+
+// Fetch financial data (budget, income, etc.)
+export const fetchFinancialData = async () => {
+  try {
+    const sheetData = await fetchSheetData(DEFAULT_SHEET_CONFIG);
+    
+    if (sheetData.length === 0) {
+      // Return sample data if sheet fetch fails
+      return {
+        totalBudget: 5000,
+        totalIncome: 6500,
+        incomeGrowth: 8.5
+      };
+    }
+    
+    const financialData: any = {};
+    FINANCIAL_DATA_MAPPINGS.forEach((mapping) => {
+      const value = getCellValue(sheetData, mapping.sheetConfig.range);
+      financialData[mapping.key] = typeof value === 'number' ? value : 0;
+    });
+    
+    return {
+      totalBudget: financialData.totalBudget || 5000,
+      totalIncome: financialData.totalIncome || 6500,
+      incomeGrowth: financialData.incomeGrowth || 8.5
+    };
+  } catch (error) {
+    console.error('Error fetching financial data:', error);
+    return {
+      totalBudget: 5000,
+      totalIncome: 6500,
+      incomeGrowth: 8.5
+    };
   }
 };

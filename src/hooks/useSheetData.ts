@@ -1,9 +1,14 @@
 
 import { useState, useEffect } from 'react';
-import { fetchAllCategoryData } from '../services/googleSheetsService';
+import { fetchAllCategoryData, fetchFinancialData } from '../services/googleSheetsService';
 
 export const useSheetData = () => {
   const [categoryData, setCategoryData] = useState<any[]>([]);
+  const [financialData, setFinancialData] = useState<any>({
+    totalBudget: 5000,
+    totalIncome: 6500,
+    incomeGrowth: 8.5
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -11,8 +16,12 @@ export const useSheetData = () => {
     const loadData = async () => {
       try {
         setLoading(true);
-        const data = await fetchAllCategoryData();
-        setCategoryData(data);
+        const [categoryResults, financialResults] = await Promise.all([
+          fetchAllCategoryData(),
+          fetchFinancialData()
+        ]);
+        setCategoryData(categoryResults);
+        setFinancialData(financialResults);
         setError(null);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load data');
@@ -33,8 +42,12 @@ export const useSheetData = () => {
   const refreshData = async () => {
     try {
       setLoading(true);
-      const data = await fetchAllCategoryData();
-      setCategoryData(data);
+      const [categoryResults, financialResults] = await Promise.all([
+        fetchAllCategoryData(),
+        fetchFinancialData()
+      ]);
+      setCategoryData(categoryResults);
+      setFinancialData(financialResults);
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to refresh data');
@@ -43,5 +56,5 @@ export const useSheetData = () => {
     }
   };
 
-  return { categoryData, loading, error, refreshData };
+  return { categoryData, financialData, loading, error, refreshData };
 };
