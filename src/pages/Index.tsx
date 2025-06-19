@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -26,11 +25,18 @@ const Index = () => {
   };
 
   const categoryData = [
-    { name: "Food & Dining", value: 650, color: "#3B82F6" },
-    { name: "Transportation", value: 420, color: "#10B981" },
-    { name: "Shopping", value: 580, color: "#F59E0B" },
-    { name: "Entertainment", value: 320, color: "#EF4444" },
-    { name: "Bills & Utilities", value: 680, color: "#8B5CF6" }
+    { name: "Debt & Loan", value: 480, color: "#EF4444" },
+    { name: "Entertainment", value: 320, color: "#F59E0B" },
+    { name: "Family", value: 290, color: "#10B981" },
+    { name: "Food", value: 650, color: "#3B82F6" },
+    { name: "Health", value: 180, color: "#8B5CF6" },
+    { name: "Housing", value: 850, color: "#EC4899" },
+    { name: "Investment", value: 400, color: "#14B8A6" },
+    { name: "Shopping", value: 380, color: "#F97316" },
+    { name: "Subscription", value: 120, color: "#6366F1" },
+    { name: "Transport", value: 220, color: "#84CC16" },
+    { name: "Work & Education", value: 300, color: "#06B6D4" },
+    { name: "Others", value: 150, color: "#64748B" }
   ];
 
   const barData = categoryData.map(item => ({
