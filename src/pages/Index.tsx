@@ -1,10 +1,10 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MessageCircle, X, DollarSign, TrendingUp, TrendingDown, PieChart, RefreshCw } from "lucide-react";
 import { PieChart as RechartsPieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
 import { useSheetData } from "../hooks/useSheetData";
+import { ThemeToggle } from "../components/ThemeToggle";
 
 const Index = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -23,7 +23,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4 md:p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 dark:from-slate-900 dark:via-purple-900 dark:to-slate-900 bg-background p-4 md:p-6 relative overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl animate-pulse"></div>
@@ -38,18 +38,21 @@ const Index = () => {
             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent mb-2 animate-fade-in">
               Web3 Financial Dashboard
             </h1>
-            <p className="text-gray-300 animate-fade-in delay-200">Decentralized financial overview powered by blockchain</p>
+            <p className="text-gray-300 dark:text-gray-300 text-muted-foreground animate-fade-in delay-200">Decentralized financial overview powered by blockchain</p>
           </div>
-          <Button 
-            onClick={refreshData} 
-            variant="outline" 
-            size="sm"
-            disabled={loading}
-            className="flex items-center gap-2 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border-cyan-400/30 text-cyan-300 hover:bg-cyan-500/30 transition-all duration-300 hover:scale-105 backdrop-blur-sm"
-          >
-            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-            Sync Chain Data
-          </Button>
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <Button 
+              onClick={refreshData} 
+              variant="outline" 
+              size="sm"
+              disabled={loading}
+              className="flex items-center gap-2 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border-cyan-400/30 text-cyan-300 hover:bg-cyan-500/30 transition-all duration-300 hover:scale-105 backdrop-blur-sm"
+            >
+              <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+              Sync Chain Data
+            </Button>
+          </div>
         </div>
 
         {/* Error Message */}
